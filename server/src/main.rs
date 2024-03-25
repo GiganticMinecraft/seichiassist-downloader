@@ -2,6 +2,7 @@ use sentry::integrations::tower::{NewSentryLayer, SentryHttpLayer};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::Layer;
+use crate::config::Config;
 
 mod domain {
     use std::fmt::Debug;
@@ -195,6 +196,21 @@ mod presentation {
     }
 }
 
+mod config {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    pub struct Config {
+        pub http_port: u16
+    }
+
+    impl Config {
+        pub async fn from_environment() -> envy::Result<Config> {
+            envy::from_env::<Config>()
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     use crate::domain::BuildHandler;
@@ -215,6 +231,10 @@ async fn main() {
             )),
         )
         .init();
+
+    let config = Config::from_environment()
+        .await
+        .expect("Failed to load config from environment variables.");
 
     // TODO: Sentryの設定をする
     // let _guard = sentry::init((
@@ -237,7 +257,7 @@ async fn main() {
     build_repository.run_stable_build().await.unwrap();
     build_repository.run_develop_build().await.unwrap();
 
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 80));
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], config.http_port));
     let listener = TcpListener::bind(&addr).await.unwrap();
 
     let router = Router::new()
