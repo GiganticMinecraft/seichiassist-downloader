@@ -1,8 +1,8 @@
+use crate::config::Config;
 use sentry::integrations::tower::{NewSentryLayer, SentryHttpLayer};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::Layer;
-use crate::config::Config;
 
 mod domain {
     use std::fmt::Debug;
@@ -201,7 +201,7 @@ mod config {
 
     #[derive(Debug, Deserialize)]
     pub struct Config {
-        pub http_port: u16
+        pub http_port: u16,
     }
 
     impl Config {
