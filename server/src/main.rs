@@ -1,3 +1,8 @@
+use sentry::integrations::tower::{NewSentryLayer, SentryHttpLayer};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::Layer;
+
 mod domain {
     use std::fmt::Debug;
     use tokio::fs::File;
@@ -107,6 +112,7 @@ mod presentation {
     use axum::response::{ErrorResponse, IntoResponse, Response, Result};
     use tokio_util::io::ReaderStream;
 
+    #[tracing::instrument]
     pub async fn get_stable_build_handler(
         State(repository): State<BuildRepository>,
     ) -> Result<impl IntoResponse> {
@@ -132,6 +138,7 @@ mod presentation {
         }
     }
 
+    #[tracing::instrument]
     pub async fn get_develop_build_handler(
         State(repository): State<BuildRepository>,
     ) -> Result<impl IntoResponse> {
@@ -157,25 +164,33 @@ mod presentation {
         }
     }
 
+    #[tracing::instrument]
     pub async fn publish_stable_build_handler(
         State(repository): State<BuildRepository>,
     ) -> Result<impl IntoResponse> {
         match repository.run_stable_build().await {
             Ok(_) => Ok(StatusCode::OK.into_response()),
-            Err(_) => Err(ErrorResponse::from(
-                StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-            )),
+            Err(err) => {
+                tracing::error!("{:}", err);
+                Err(ErrorResponse::from(
+                    StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+                ))
+            }
         }
     }
 
+    #[tracing::instrument]
     pub async fn publish_develop_build_handler(
         State(repository): State<BuildRepository>,
     ) -> Result<impl IntoResponse> {
         match repository.run_develop_build().await {
             Ok(_) => Ok(StatusCode::OK.into_response()),
-            Err(_) => Err(ErrorResponse::from(
-                StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-            )),
+            Err(err) => {
+                tracing::error!("{:}", err);
+                Err(ErrorResponse::from(
+                    StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+                ))
+            }
         }
     }
 }
@@ -192,6 +207,31 @@ async fn main() {
     use axum::Router;
     use tokio::net::TcpListener;
 
+    tracing_subscriber::registry()
+        .with(sentry::integrations::tracing::layer())
+        .with(
+            tracing_subscriber::fmt::layer().with_filter(tracing_subscriber::EnvFilter::new(
+                std::env::var("RUST_LOG").unwrap_or_else(|_| "info".into()),
+            )),
+        )
+        .init();
+
+    // TODO: Sentryの設定をする
+    // let _guard = sentry::init((
+    //     "",
+    //     sentry::ClientOptions {
+    //         release: sentry::release_name!(),
+    //         traces_sample_rate: 1.0,
+    //         ..Default::default()
+    //     },
+    // ));
+
+    // sentry::configure_scope(|scope| scope.set_level(Some(sentry::Level::Warning)));
+
+    let layer = tower::ServiceBuilder::new()
+        .layer(NewSentryLayer::new_from_top())
+        .layer(SentryHttpLayer::with_transaction());
+
     let build_repository = BuildRepository {};
 
     build_repository.run_stable_build().await.unwrap();
@@ -205,7 +245,8 @@ async fn main() {
         .route("/develop", get(get_develop_build_handler))
         .route("/publish/stable", post(publish_stable_build_handler))
         .route("/publish/develop", post(publish_develop_build_handler))
-        .with_state(build_repository);
+        .with_state(build_repository)
+        .layer(layer);
 
     axum::serve(listener, router).await.unwrap();
 }
