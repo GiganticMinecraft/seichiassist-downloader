@@ -63,21 +63,27 @@ mod infra_repository_impls {
 
     impl BuildHandler for BuildRepository {
         async fn run_stable_build(&self) -> anyhow::Result<()> {
+            println!("a");
             switch_branch(Branch::Master).await?;
+            println!("b");
             Command::new("sbt")
                 .arg("build")
                 .current_dir("/SeichiAssist")
                 .output()?;
+            println!("c");
 
             if !Path::new(STABLE_BUILD_DIR_PATH).is_dir() {
                 fs::create_dir(STABLE_BUILD_DIR_PATH)?;
             }
+            println!("d");
 
             if Path::new(STABLE_BUILD_FILE_PATH).is_file() {
                 fs::remove_file(STABLE_BUILD_FILE_PATH)?;
             }
+            println!("e");
 
             fs::copy(BUILD_ARTIFACT_PATH, STABLE_BUILD_FILE_PATH)?;
+            println!("f");
 
             Ok(())
         }
