@@ -66,10 +66,11 @@ mod infra_repository_impls {
             println!("a");
             switch_branch(Branch::Master).await?;
             println!("b");
-            Command::new("sbt")
+            let sbt_compile_log = Command::new("sbt")
                 .arg("build")
                 .current_dir("/SeichiAssist")
                 .output()?;
+            println!("{:?}", sbt_compile_log);
             println!("c");
 
             if !Path::new(STABLE_BUILD_DIR_PATH).is_dir() {
