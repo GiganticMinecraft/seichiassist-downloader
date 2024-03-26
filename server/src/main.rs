@@ -44,9 +44,10 @@ mod infra_repository_impls {
     use std::process::Command;
 
     async fn switch_branch(branch: Branch) -> anyhow::Result<()> {
+        // TODO: masterブランチとdevelopブランチに1.18のコードが取り込まれたらでブランチ名を直す
         let branch_name = match branch {
-            Branch::Master => "master",
-            Branch::Develop => "develop",
+            Branch::Master => "1_18",
+            Branch::Develop => "1_18",
         };
 
         Command::new("git")
