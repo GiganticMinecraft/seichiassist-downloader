@@ -19,7 +19,7 @@ RUN cargo build --release
 FROM ubuntu:22.04
 LABEL org.opencontainers.image.source=https://github.com/GiganticMinecraft/seichiassist-downloader
 RUN apt-get update -y && \
-    apt-get install -y git curl gnupg && \
+    apt-get install -y git curl gnupg openjdk-17-jdk && \
     git clone https://github.com/GiganticMinecraft/SeichiAssist.git
 
 # sbt 公式リポジトリを追加
