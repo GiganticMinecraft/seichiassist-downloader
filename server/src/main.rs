@@ -13,7 +13,7 @@ mod domain {
         Develop,
     }
 
-    pub const BUILD_ARTIFACT_PATH: &str = "/SeichiAssist/target/SeichiAssist.jar";
+    pub const BUILD_ARTIFACT_PATH: &str = "/SeichiAssist/target/build/SeichiAssist.jar";
 
     pub const STABLE_BUILD_DIR_PATH: &str = "/builds/stable";
     pub const STABLE_BUILD_FILE_PATH: &str = "/builds/stable/SeichiAssist.jar";
