@@ -64,38 +64,41 @@ mod infra_repository_impls {
 
     impl BuildHandler for BuildRepository {
         async fn run_stable_build(&self) -> anyhow::Result<()> {
-            println!("a");
             switch_branch(Branch::Master).await?;
-            println!("b");
-            let sbt_compile_log = Command::new("sbt")
+
+            tracing::info!("Building SeichiAssist(stable)...");
+
+            Command::new("sbt")
                 .arg("assembly")
                 .current_dir("/SeichiAssist")
                 .output()?;
-            println!("{:?}", sbt_compile_log);
-            println!("c");
+
+            tracing::info!("Build completed.");
 
             if !Path::new(STABLE_BUILD_DIR_PATH).is_dir() {
                 fs::create_dir(STABLE_BUILD_DIR_PATH)?;
             }
-            println!("d");
 
             if Path::new(STABLE_BUILD_FILE_PATH).is_file() {
                 fs::remove_file(STABLE_BUILD_FILE_PATH)?;
             }
-            println!("e");
 
             fs::rename(BUILD_ARTIFACT_PATH, STABLE_BUILD_FILE_PATH)?;
-            println!("f");
 
             Ok(())
         }
 
         async fn run_develop_build(&self) -> anyhow::Result<()> {
             switch_branch(Branch::Develop).await?;
+
+            tracing::info!("Building SeichiAssist(develop)...");
+
             Command::new("sbt")
                 .arg("assembly")
                 .current_dir("/SeichiAssist")
                 .status()?;
+
+            tracing::info!("Build completed.");
 
             if !Path::new(DEVELOP_BUILD_DIR_PATH).is_dir() {
                 fs::create_dir(DEVELOP_BUILD_DIR_PATH)?;
