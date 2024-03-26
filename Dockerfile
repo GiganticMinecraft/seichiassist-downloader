@@ -31,9 +31,11 @@ RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/ap
 RUN apt-get update && \
     apt-get install -y sbt
 
-RUN localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 && \
-    LANG=ja_JP.UTF-8 && \
-    export LANG
+# localeの設定
+RUN locale-gen en_US.UTF-8  
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8
 
 COPY --from=build-env --link /app/target/release/seichiassist-downloader /
 CMD ["./seichiassist-downloader"]
