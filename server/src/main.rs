@@ -73,7 +73,10 @@ mod infra_repository_impls {
                 fs::create_dir(STABLE_BUILD_DIR_PATH)?;
             }
 
-            fs::remove_file(STABLE_BUILD_FILE_PATH)?;
+            if Path::new(STABLE_BUILD_FILE_PATH).is_file() {
+                fs::remove_file(STABLE_BUILD_FILE_PATH)?;
+            }
+
             fs::copy(BUILD_ARTIFACT_PATH, STABLE_BUILD_FILE_PATH)?;
 
             Ok(())
@@ -90,7 +93,10 @@ mod infra_repository_impls {
                 fs::create_dir(DEVELOP_BUILD_DIR_PATH)?;
             }
 
-            fs::remove_file(DEVELOP_BUILD_FILE_PATH)?;
+            if Path::new(DEVELOP_BUILD_FILE_PATH).is_file() {
+                fs::remove_file(DEVELOP_BUILD_FILE_PATH)?;
+            }
+
             fs::copy(BUILD_ARTIFACT_PATH, DEVELOP_BUILD_FILE_PATH)?;
 
             Ok(())
