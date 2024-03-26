@@ -67,7 +67,7 @@ mod infra_repository_impls {
             switch_branch(Branch::Master).await?;
             println!("b");
             let sbt_compile_log = Command::new("sbt")
-                .arg("build")
+                .arg("assembly")
                 .current_dir("/SeichiAssist")
                 .output()?;
             println!("{:?}", sbt_compile_log);
@@ -92,7 +92,7 @@ mod infra_repository_impls {
         async fn run_develop_build(&self) -> anyhow::Result<()> {
             switch_branch(Branch::Develop).await?;
             Command::new("sbt")
-                .arg("build")
+                .arg("assembly")
                 .current_dir("/SeichiAssist")
                 .status()?;
 
