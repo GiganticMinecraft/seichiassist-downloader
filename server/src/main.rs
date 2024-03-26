@@ -84,7 +84,7 @@ mod infra_repository_impls {
             }
             println!("e");
 
-            fs::copy(BUILD_ARTIFACT_PATH, STABLE_BUILD_FILE_PATH)?;
+            fs::rename(BUILD_ARTIFACT_PATH, STABLE_BUILD_FILE_PATH)?;
             println!("f");
 
             Ok(())
@@ -105,7 +105,7 @@ mod infra_repository_impls {
                 fs::remove_file(DEVELOP_BUILD_FILE_PATH)?;
             }
 
-            fs::copy(BUILD_ARTIFACT_PATH, DEVELOP_BUILD_FILE_PATH)?;
+            fs::rename(BUILD_ARTIFACT_PATH, DEVELOP_BUILD_FILE_PATH)?;
 
             Ok(())
         }
