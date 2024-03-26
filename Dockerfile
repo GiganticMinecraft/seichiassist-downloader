@@ -20,8 +20,7 @@ FROM ubuntu:22.04
 LABEL org.opencontainers.image.source=https://github.com/GiganticMinecraft/seichiassist-downloader
 RUN apt-get update -y && \
     apt-get install -y git curl gnupg openjdk-17-jdk && \
-    git clone --recursive https://github.com/GiganticMinecraft/SeichiAssist.git && \
-    chmod +xwr SeichiAssist
+    git clone --recursive https://github.com/GiganticMinecraft/SeichiAssist.git
 
 # sbt 公式リポジトリを追加
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list && \
@@ -32,7 +31,10 @@ RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/ap
 RUN apt-get update && \
     apt-get install -y sbt
 
-# ロケールをUTF-8に設定する
+# 必要なディレクトリを作っておく
+RUN mkdir -p /SeichiAssist/target/build/ /builds/stable /builds/develop
+
+# ロケールをUTF-8に設定する (SeichiAssistにギリシャ文字(λ)が含まれているため、デフォルト状態ではビルドsエラーが出る)
 ENV LANG C.UTF-8
 
 COPY --from=build-env --link /app/target/release/seichiassist-downloader /
