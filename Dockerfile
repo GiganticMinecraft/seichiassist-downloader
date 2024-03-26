@@ -20,7 +20,7 @@ FROM ubuntu:22.04
 LABEL org.opencontainers.image.source=https://github.com/GiganticMinecraft/seichiassist-downloader
 RUN apt-get update -y && \
     apt-get install -y git curl gnupg openjdk-17-jdk && \
-    git clone https://github.com/GiganticMinecraft/SeichiAssist.git
+    git clone --recursive https://github.com/GiganticMinecraft/SeichiAssist.git
 
 # sbt 公式リポジトリを追加
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list && \
