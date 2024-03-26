@@ -51,9 +51,11 @@ mod infra_repository_impls {
 
         Command::new("git")
             .args(vec!["switch", branch_name])
+            .current_dir("/SeichiAssist")
             .status()?;
         Command::new("git")
             .args(vec!["pull", "origin", branch_name])
+            .current_dir("/SeichiAssist")
             .status()?;
 
         Ok(())
@@ -62,7 +64,10 @@ mod infra_repository_impls {
     impl BuildHandler for BuildRepository {
         async fn run_stable_build(&self) -> anyhow::Result<()> {
             switch_branch(Branch::Master).await?;
-            Command::new("sbt").arg("build").output()?;
+            Command::new("sbt")
+                .arg("build")
+                .current_dir("/SeichiAssist")
+                .output()?;
 
             if !Path::new(STABLE_BUILD_DIR_PATH).is_dir() {
                 fs::create_dir(STABLE_BUILD_DIR_PATH)?;
@@ -76,7 +81,10 @@ mod infra_repository_impls {
 
         async fn run_develop_build(&self) -> anyhow::Result<()> {
             switch_branch(Branch::Develop).await?;
-            Command::new("sbt").arg("build").status()?;
+            Command::new("sbt")
+                .arg("build")
+                .current_dir("/SeichiAssist")
+                .status()?;
 
             if !Path::new(DEVELOP_BUILD_DIR_PATH).is_dir() {
                 fs::create_dir(DEVELOP_BUILD_DIR_PATH)?;
