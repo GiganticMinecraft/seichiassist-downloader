@@ -130,6 +130,8 @@ mod presentation {
     use axum::extract::State;
     use axum::http::StatusCode;
     use axum::response::{ErrorResponse, IntoResponse, Response, Result};
+    use axum::Json;
+    use serde_json::json;
     use tokio_util::io::ReaderStream;
 
     #[tracing::instrument]
@@ -151,7 +153,7 @@ mod presentation {
             Err(_) => Err(ErrorResponse::from(
                 (
                     StatusCode::SERVICE_UNAVAILABLE,
-                    "SeichiAssist was not built yet.",
+                    Json(json!({"error": "SeichiAssist was not built yet."})),
                 )
                     .into_response(),
             )),
@@ -177,7 +179,7 @@ mod presentation {
             Err(_) => Err(ErrorResponse::from(
                 (
                     StatusCode::SERVICE_UNAVAILABLE,
-                    "SeichiAssist was not built yet.",
+                    Json(json!({"error": "SeichiAssist was not built yet."})),
                 )
                     .into_response(),
             )),
