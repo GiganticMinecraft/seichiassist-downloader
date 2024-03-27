@@ -40,3 +40,7 @@
 | HTTP_PORT      | 80      |
 | STABLE_BRANCH  | master  |
 | DEVELOP_BRANCH | develop |
+
+# 各エンドポイントについて
+
+各エンドポイントは [GitHub Pages に API 定義](https://giganticminecraft.github.io/seichiassist-downloader/)があるので参照してください。
