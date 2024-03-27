@@ -41,7 +41,7 @@ jobs:
         uses: Legion2/swagger-ui-action@v1
         with:
           output: swagger-ui
-          spec-file: api/tsp-output/@typespec/openapi3/openapi.yaml
+          spec-file: tsp-output/@typespec/openapi3/openapi.yaml
 
       - name: Upload Swagger UI
         uses: actions/upload-pages-artifact@v3
