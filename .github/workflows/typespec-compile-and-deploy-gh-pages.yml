@@ -9,7 +9,7 @@ on:
       - ".github/workflows/typespec-compile-and-deploy-gh-pages.yml"
 
 jobs:
-  setup:
+  compile:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout
@@ -34,10 +34,6 @@ jobs:
       - name: Install node_modules
         run: cd api && npm ci
 
-  compile:
-    needs: setup
-    runs-on: ubuntu-22.04
-    steps:
       - name: Compile typespec
         run: tsp compile api
 
