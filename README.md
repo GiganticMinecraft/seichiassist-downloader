@@ -1,6 +1,6 @@
 # seichiassist-downloader
 
-[SeichiAssist](https://github.com/GiganticMinecraft/SeichiAssist/)の jar ファイルをダウンロードするためのソフトウェア
+[SeichiAssist](https://github.com/GiganticMinecraft/SeichiAssist/) の jar ファイルをダウンロードするためのソフトウェア
 
 # 作成した経緯
 
