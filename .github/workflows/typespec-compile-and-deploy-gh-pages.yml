@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Compile typespec
-        run: typespec compile api
+        run: tsp compile api
 
       - name: Generate Swagger UI
         uses: Legion2/swagger-ui-action@v1
