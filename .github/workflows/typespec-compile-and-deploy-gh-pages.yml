@@ -1,0 +1,67 @@
+name: typespec-compile-and-deploy-gh-pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "api/"
+      - ".github/workflows/typespec-compile-and-deploy-gh-pages.yml"
+
+jobs:
+  setup:
+    runs-on: ubuntu:22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install typespec
+        run: npm install -g @typespec/compiler
+
+      - name: Cache npm modules
+        uses: actions/cache@v4
+        with:
+          path: api/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('api/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install node_modules
+        run: cd api && npm ci
+
+  compile:
+    needs: setup
+    runs-on: ubuntu:22.04
+    steps:
+      - name: Compile typespec
+        run: typespec compile api
+
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@v1
+        with:
+          output: swagger-ui
+          spec-file: api/tsp-output/@typespec/openapi3/openapi.yaml
+
+      - name: Upload Swagger UI
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: swagger-ui
+
+  deploy-github-pages:
+    needs: compile
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu:22.04
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
