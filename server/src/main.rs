@@ -1,15 +1,9 @@
-use crate::config::Config;
-use sentry::integrations::tower::{NewSentryLayer, SentryHttpLayer};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::Layer;
-
 mod domain {
     use std::fmt::Debug;
     use tokio::fs::File;
 
     pub enum Branch {
-        Master,
+        Stable,
         Develop,
     }
 
@@ -33,6 +27,7 @@ mod domain {
 }
 
 mod infra_repository_impls {
+    use crate::config::CONFIG;
     use crate::domain::Branch;
     use crate::domain::{
         BuildHandler, BuildRepository, BUILD_ARTIFACT_PATH, DEVELOP_BUILD_DIR_PATH,
@@ -44,10 +39,9 @@ mod infra_repository_impls {
     use std::process::Command;
 
     async fn switch_branch(branch: Branch) -> anyhow::Result<()> {
-        // TODO: masterブランチとdevelopブランチに1.18のコードが取り込まれたらでブランチ名を直す
         let branch_name = match branch {
-            Branch::Master => "1_18",
-            Branch::Develop => "1_18",
+            Branch::Stable => CONFIG.stable_branch_name.as_str(),
+            Branch::Develop => CONFIG.develop_branch_name.as_str(),
         };
 
         Command::new("git")
@@ -64,7 +58,7 @@ mod infra_repository_impls {
 
     impl BuildHandler for BuildRepository {
         async fn run_stable_build(&self) -> anyhow::Result<()> {
-            switch_branch(Branch::Master).await?;
+            switch_branch(Branch::Stable).await?;
 
             tracing::info!("Building SeichiAssist(stable)...");
 
@@ -222,22 +216,23 @@ mod presentation {
 }
 
 mod config {
+    use once_cell::sync::Lazy;
     use serde::Deserialize;
 
     #[derive(Debug, Deserialize)]
     pub struct Config {
         pub http_port: u16,
+        pub stable_branch_name: String,
+        pub develop_branch_name: String,
     }
 
-    impl Config {
-        pub async fn from_environment() -> envy::Result<Config> {
-            envy::from_env::<Config>()
-        }
-    }
+    pub static CONFIG: Lazy<Config> =
+        Lazy::new(|| envy::from_env().expect("Failed to load config from environment variables."));
 }
 
 #[tokio::main]
 async fn main() {
+    use crate::config::CONFIG;
     use crate::domain::BuildHandler;
     use crate::domain::BuildRepository;
     use crate::presentation::{
@@ -246,7 +241,11 @@ async fn main() {
     };
     use axum::routing::{get, post};
     use axum::Router;
+    use sentry::integrations::tower::{NewSentryLayer, SentryHttpLayer};
     use tokio::net::TcpListener;
+    use tracing_subscriber::layer::SubscriberExt;
+    use tracing_subscriber::util::SubscriberInitExt;
+    use tracing_subscriber::Layer;
 
     tracing_subscriber::registry()
         .with(sentry::integrations::tracing::layer())
@@ -256,10 +255,6 @@ async fn main() {
             )),
         )
         .init();
-
-    let config = Config::from_environment()
-        .await
-        .expect("Failed to load config from environment variables.");
 
     // TODO: Sentryの設定をする
     // let _guard = sentry::init((
@@ -282,7 +277,7 @@ async fn main() {
     build_repository.run_stable_build().await.unwrap();
     build_repository.run_develop_build().await.unwrap();
 
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], config.http_port));
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], CONFIG.http_port));
     let listener = TcpListener::bind(&addr).await.unwrap();
 
     let router = Router::new()

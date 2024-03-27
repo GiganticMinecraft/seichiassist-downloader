@@ -1040,6 +1040,7 @@ dependencies = [
  "anyhow",
  "axum",
  "envy",
+ "once_cell",
  "sentry",
  "serde",
  "tokio",
