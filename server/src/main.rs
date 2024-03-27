@@ -288,5 +288,7 @@ async fn main() {
         .with_state(build_repository)
         .layer(layer);
 
+    tracing::info!("Listening on: {}", addr);
+
     axum::serve(listener, router).await.unwrap();
 }
