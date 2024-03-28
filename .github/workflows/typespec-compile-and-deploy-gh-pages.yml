@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "api/"
+      - "api/**"
       - ".github/workflows/typespec-compile-and-deploy-gh-pages.yml"
 
 jobs:
