@@ -195,7 +195,7 @@ mod presentation {
         State(repository): State<BuildRepository>,
         TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
     ) -> Result<impl IntoResponse> {
-        if auth.token().to_string() != CONFIG.token {
+        if auth.token() != CONFIG.token.as_str() {
             return Err(ErrorResponse::from(StatusCode::FORBIDDEN.into_response()));
         }
 
@@ -215,7 +215,7 @@ mod presentation {
         State(repository): State<BuildRepository>,
         TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
     ) -> Result<impl IntoResponse> {
-        if auth.token().to_string() != CONFIG.token {
+        if auth.token() != CONFIG.token.as_str() {
             return Err(ErrorResponse::from(StatusCode::FORBIDDEN.into_response()));
         }
 
