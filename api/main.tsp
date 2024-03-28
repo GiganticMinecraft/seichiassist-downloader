@@ -6,21 +6,20 @@ using TypeSpec.Http;
   title: "seichiassist-downloader",
 })
 @server("http://localhost", "Development server")
-
 namespace SeichiAssistDownloader {
   @route("/stable")
   @get
   @summary("最新の安定版SeichiAssistをダウンロードする")
   op getStable(): {
-    @statusCode statusCode: 200,
-    @header contentType: "application/java-archive",
-    @body body: bytes,
+    @statusCode statusCode: 200;
+    @header contentType: "application/java-archive";
+    @body body: bytes;
   } | {
-    @statusCode statusCode: 503,
-    @header contentType: "application/json",
+    @statusCode statusCode: 503;
+    @header contentType: "application/json";
     @body body: {
-      message: string,
-    },
+      message: string;
+    };
   };
 
   @route("/publish/stable")
@@ -28,11 +27,11 @@ namespace SeichiAssistDownloader {
   @useAuth(BearerAuth)
   @summary("安定版ブランチに更新があったことを通知する")
   op publishStable(): {
-    @statusCode statusCode: 200,
+    @statusCode statusCode: 200;
   } | {
-    @statusCode statusCode: 403
+    @statusCode statusCode: 403;
   } | {
-    @statusCode statusCode: 500
+    @statusCode statusCode: 500;
   };
 
   @route("/develop")
@@ -40,15 +39,15 @@ namespace SeichiAssistDownloader {
   @useAuth(BearerAuth)
   @summary("最新の開発版SeichiAssistをダウンロードする")
   op getDevelopment(): {
-    @statusCode statusCode: 200,
-    @header contentType: "application/java-archive",
-    @body body: bytes,
+    @statusCode statusCode: 200;
+    @header contentType: "application/java-archive";
+    @body body: bytes;
   } | {
-    @statusCode statusCode: 503,
-    @header contentType: "application/json",
+    @statusCode statusCode: 503;
+    @header contentType: "application/json";
     @body body: {
-      message: string,
-    },
+      message: string;
+    };
   };
 
   @route("/publish/develop")
@@ -57,8 +56,8 @@ namespace SeichiAssistDownloader {
   op publishDevelopment(): {
     @statusCode statusCode: 200;
   } | {
-    @statusCode statusCode: 403
+    @statusCode statusCode: 403;
   } | {
-    @statusCode statusCode: 500
+    @statusCode statusCode: 500;
   };
-};
+}
