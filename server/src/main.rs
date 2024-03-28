@@ -131,8 +131,12 @@ mod presentation {
     use axum::http::StatusCode;
     use axum::response::{ErrorResponse, IntoResponse, Response, Result};
     use axum::Json;
+    use axum_extra::headers::Authorization;
+    use axum_extra::headers::authorization::Bearer;
+    use axum_extra::TypedHeader;
     use serde_json::json;
     use tokio_util::io::ReaderStream;
+    use crate::config::CONFIG;
 
     #[tracing::instrument]
     pub async fn get_stable_build_handler(
@@ -189,7 +193,12 @@ mod presentation {
     #[tracing::instrument]
     pub async fn publish_stable_build_handler(
         State(repository): State<BuildRepository>,
+        TypedHeader(auth): TypedHeader<Authorization<Bearer>>
     ) -> Result<impl IntoResponse> {
+        if auth.token().to_string() != CONFIG.token {
+            return Err(ErrorResponse::from(StatusCode::FORBIDDEN.into_response()))
+        }
+
         match repository.run_stable_build().await {
             Ok(_) => Ok(StatusCode::OK.into_response()),
             Err(err) => {
@@ -204,9 +213,14 @@ mod presentation {
     #[tracing::instrument]
     pub async fn publish_develop_build_handler(
         State(repository): State<BuildRepository>,
+        TypedHeader(auth): TypedHeader<Authorization<Bearer>>
     ) -> Result<impl IntoResponse> {
+        if auth.token().to_string() != CONFIG.token {
+            return Err(ErrorResponse::from(StatusCode::FORBIDDEN.into_response()))
+        }
+
         match repository.run_develop_build().await {
-            Ok(_) => Ok(StatusCode::OK.into_response()),
+            Ok(_)  => Ok(StatusCode::OK.into_response()),
             Err(err) => {
                 tracing::error!("{:}", err);
                 Err(ErrorResponse::from(
@@ -226,6 +240,7 @@ mod config {
         pub http_port: u16,
         pub stable_branch_name: String,
         pub develop_branch_name: String,
+        pub token: String,
     }
 
     pub static CONFIG: Lazy<Config> =
