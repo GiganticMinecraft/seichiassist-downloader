@@ -1,4 +1,4 @@
 server/target
 .idea
 api/node_modules
-api/tsp-output
+**/tsp-output
