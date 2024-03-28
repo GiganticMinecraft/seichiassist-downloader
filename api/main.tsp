@@ -25,15 +25,19 @@ namespace SeichiAssistDownloader {
 
   @route("/publish/stable")
   @post
+  @useAuth(BearerAuth)
   @summary("安定版ブランチに更新があったことを通知する")
   op publishStable(): {
-    @statusCode statusCode: 200
+    @statusCode statusCode: 200,
+  } | {
+    @statusCode statusCode: 403
   } | {
     @statusCode statusCode: 500
   };
 
   @route("/develop")
   @get
+  @useAuth(BearerAuth)
   @summary("最新の開発版SeichiAssistをダウンロードする")
   op getDevelopment(): {
     @statusCode statusCode: 200,
@@ -52,6 +56,8 @@ namespace SeichiAssistDownloader {
   @summary("開発版ブランチに更新があったことを通知する")
   op publishDevelopment(): {
     @statusCode statusCode: 200;
+  } | {
+    @statusCode statusCode: 403
   } | {
     @statusCode statusCode: 500
   };
