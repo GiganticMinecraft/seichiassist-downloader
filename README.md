@@ -35,11 +35,12 @@
 
 # 環境変数
 
-| 環境変数名     | 例      |
-| -------------- | ------- |
+| 環境変数名          | 例       |
+|----------------|---------|
 | HTTP_PORT      | 80      |
 | STABLE_BRANCH  | master  |
 | DEVELOP_BRANCH | develop |
+| TOKEN          | token   |
 
 # 各エンドポイントについて
 
