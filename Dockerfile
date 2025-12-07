@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.12
-FROM lukemathwalker/cargo-chef:latest-rust-1.77-slim AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-1.91-slim AS chef
 WORKDIR /app
 
 FROM chef AS planner
@@ -39,4 +39,5 @@ ENV LANG C.UTF-8
 
 COPY --from=build-env --link /app/target/release/seichiassist-downloader /
 CMD ["./seichiassist-downloader"]
+
 
