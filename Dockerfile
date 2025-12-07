@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.12
+# syntax=docker/dockerfile:1.20
 FROM lukemathwalker/cargo-chef:latest-rust-1.91-slim AS chef
 WORKDIR /app
 
